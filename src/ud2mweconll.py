@@ -12,8 +12,8 @@ from conll import CoNLLReader,DependencyTree
 ###TODO determine which mwes are free and which ones are fixed
 ###TODO newhead feature?
 
-fixedmwes = ["mwe","compound",'name']
-freemwes= ["compound:prt"]
+fixedmwes = ["mwe","compound","name"]
+freemwes= ["compound:prt","aux"]
 
 
 def get_most_common_filler(treebank):
@@ -84,19 +84,23 @@ def flatten_mwe_chains(sent,most_common_label_filler):
                     second_degree_dependent_label = sent[head_of_external_dependent]
                     outsent.add_edge(component[0], ext_dep, {"deprel": second_degree_dependent_label})
 
-            #Complete the tree with the already-existing edges from sent
-            already_attached = []
-            for h,d in outsent.edges():
-                already_attached.append(d)
-            for h,d in sent.edges():
-                if d not in already_attached:
-                    outsent.add_edge(h,d,sent[h][d])
 
-            #Check for well-formed ness, isTree, isDGA, etc.
-        else: #otherwise we treat is a non-fixed MWE
-            pass
+        else: #if the span is not well-formed, we treat is a non-fixed MWE
+            for n in component:
+                h = sent.head_of(n)
+                non_fixed_mwe_label = sent[h][n]["deprel"] + "_rmwe_" + "FREEEXPRESSION"
+                outsent.add_edge(h,n)
+
+    # Complete the tree with the already-existing edges from sent
+    # Check for well-formed ness, isTree, isDGA, etc.
+
+    already_attached = [d for h, d in outsent.edges()]
+    for h, d in sent.edges():
+        if d not in already_attached:
+            outsent.add_edge(h, d, sent[h][d])
     #
     print(outsent.edges(),nx.is_tree(outsent))
+    return outsent
 
 
 
