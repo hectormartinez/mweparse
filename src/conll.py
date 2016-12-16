@@ -38,6 +38,16 @@ class DependencyTree(nx.DiGraph):
     def __init__(self):
         nx.DiGraph.__init__(self)
 
+    def __str__(self):
+        return " ".join([self.node[x]['form'] for x in self.nodes()])
+
+    def pos_sequence(self):
+        return " ".join([self.node[x].get('cpostag',"MISSING") for x in self.nodes()])
+
+    def deprel_sequence(self):
+        return "--".join([str(self[h][d]['deprel']) for h,d in self.edges()])
+
+
     def pathtoroot(self, child):
         path = []
         newhead = self.head_of(self, child)
@@ -302,7 +312,7 @@ class CoNLLReader(object):
                     head_i = sent.head_of(token_i)
                     token_dict['head'] = head_i
                     token_dict['phead'] = head_i
-                    token_dict['postag'] = token_dict['cpostag']
+                    token_dict['postag'] =  token_dict['cpostag']
 
                     # print(head_i, token_i)
                     token_dict['deprel'] = sent[head_i][token_i]['deprel']
@@ -323,7 +333,7 @@ class CoNLLReader(object):
             print(u"", file=out)
 
 
-    def read_conll_u(self,filename,keepFusedForm=False, lang=None, posPreferenceDict=None):
+    def read_conll_u(self,filename,keepFusedForm=False, lang=None, posPreferenceDict=None,ignoreSecondaryDeps=True):
         sentences = []
         sent = DependencyTree()
         multi_tokens = {}
@@ -357,8 +367,11 @@ class CoNLLReader(object):
                     sent.add_edge(token_dict['head'], token_dict['id'], deprel=token_dict['deprel'])
                     sent.node[token_dict['id']].update({k: v for (k, v) in token_dict.items()
                                                         if k not in ('head', 'id', 'deprel', 'deps')})
-                    for head, deprel in token_dict['deps']:
-                        sent.add_edge(head, token_dict['id'], deprel=deprel, secondary=True)
+                    if ignoreSecondaryDeps:
+                        pass
+                    else:
+                        for head, deprel in token_dict['deps']:
+                            sent.add_edge(head, token_dict['id'], deprel=deprel, secondary=True)
                 else:
                     #print(token_dict['id'])
                     first_token_id = int(token_dict['id'][0])
