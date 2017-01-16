@@ -1,0 +1,14 @@
+---
+aux
+auxpass
+compound
+cop
+foreign
+mwe
+name
+compound:prt
+cc:preconj
+auxpass:reflex
+compound:nn
+compound:lvc
+conj:preconj

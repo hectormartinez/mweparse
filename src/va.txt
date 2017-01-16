@@ -1,0 +1,10 @@
+mwe
+name
+---
+compound
+compound:prt
+cc:preconj
+auxpass:reflex
+compound:nn
+compound:lvc
+conj:preconj

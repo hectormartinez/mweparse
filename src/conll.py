@@ -44,8 +44,15 @@ class DependencyTree(nx.DiGraph):
     def pos_sequence(self):
         return " ".join([self.node[x].get('cpostag',"MISSING") for x in self.nodes()])
 
+    def pos_list(self):
+        return [self.node[x].get('cpostag', "MISSING") for x in self.nodes()]
+
+
+    def form_list(self):
+        return [self.node[x].get('form', "MISSING") for x in self.nodes()]
+
     def deprel_sequence(self):
-        return "--".join([str(self[h][d]['deprel']) for h,d in self.edges()])
+        return [str(self[h][d]['deprel']) for h,d in self.edges()]
 
 
     def pathtoroot(self, child):
