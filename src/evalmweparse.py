@@ -88,7 +88,7 @@ def report_metrics(predictedfile,metrics):
     o = dict()
     outname = predictedfile.split("/")[-1]
     outname = outname.replace("_dev_","\t").replace(".conll.","").replace(".conll","")
-    outname = outname.replace("v0v0","v0").replace("vava","va").replace("vbvb","vb").replace("vcvc","vc")
+    outname = outname.replace("v0v0","v0").replace("vava","va").replace("vbvb","vb").replace("vcvc","vc").replace("-","\t")
     o["z_perfect_UAS"] = metrics["n_perfect_match_UAS"] / metrics["d_sentences"]
     o["z_perfect_LAS"] = metrics["n_perfect_match_LAS"] / metrics["d_sentences"]
     o["a__LAS"] = metrics["n_LAS"] / metrics["d_words"]
@@ -97,6 +97,9 @@ def report_metrics(predictedfile,metrics):
     o["b_free_LAS"] = metrics["n_free_LAS"] / metrics["d_n_freetokens"]
     o["b_nominal_LAS"] = metrics["n_nominal_LAS"] / metrics["d_n_nominaltokens"]
     o["boot_LAS"] = metrics["n_root_LAS"] / metrics["d_n_roottokens"]
+    o["zz_nwords"] = metrics["d_words"]
+    o["zz_nsentences"] = metrics["d_sentences"]
+
 
     #print(sorted(o.keys()))
     print("\t".join([outname]+["{0:.2f}".format(o[k]) for k in sorted(o.keys())]))

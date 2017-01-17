@@ -4,7 +4,7 @@ auxpass
 compound
 cop
 foreign
-mwe
+fixed
 name
 compound:prt
 cc:preconj

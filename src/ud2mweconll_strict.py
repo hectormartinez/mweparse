@@ -57,6 +57,13 @@ def is_well_formed_span(span): #1,2,3 is good, 1,3 is not.
     else:
         return False
 
+def modif_labels(sent):
+    for h,d in sent.edges():
+        if sent[h][d]["deprel"] == "mwe":
+            sent[h][d]["deprel"] = "fixed"
+            print(sent)
+    return sent
+
 def flatten_mwe_chains(sent,most_common_label_filler):
     auxgraph = nx.Graph()
     outsent = DependencyTree()
@@ -93,7 +100,7 @@ def flatten_mwe_chains(sent,most_common_label_filler):
                 former_head_of_n = sent.head_of(n)
                 former_label_of_n = sent[former_head_of_n][n]["deprel"]
                 #mwe_label = former_label_of_n + "_rmwe_" + most_common_label_filler[former_label_of_n]
-                mwe_label = former_label_of_n +"_"+ most_common_label_filler[former_label_of_n]
+                mwe_label = former_label_of_n + "_"+most_common_label_filler[former_label_of_n]
 
                 outsent.add_edge(component[0],n,{"deprel":mwe_label})
                 #outsent.add_edge(component[0], n, {"deprel": 'nsubj'})
@@ -112,19 +119,7 @@ def flatten_mwe_chains(sent,most_common_label_filler):
                     #outsent.add_edge(component[0], ext_dep, {"deprel": 'nsubj'})
 
         else: #if the span is not well-formed, we treat is a non-fixed MWE
-            for n in component:
-                h = sent.head_of(n)
-                head_over_mwe = sent.head_of(h)
-                try:
-                    overall_mwe_function = sent[head_over_mwe][h]['deprel']
-                except:
-                    overall_mwe_function = sent[h][n]['deprel']
-                non_fixed_mwe_label = sent[h][n]["deprel"] + "_rmwe_" + most_common_label_filler[overall_mwe_function]
-
-                #This is a patch,and it is fairly ugly
-                if "root" in non_fixed_mwe_label:
-                    non_fixed_mwe_label = "root"
-                outsent.add_edge(h,n, { "deprel" : non_fixed_mwe_label})
+            pass
 
     # Complete the tree with the already-existing edges from sent
     # Check for well-formed ness, isTree, isDGA, etc.
@@ -145,12 +140,6 @@ def flatten_mwe_chains(sent,most_common_label_filler):
     return outsent
 
 
-def modif_labels(sent):
-    for h,d in sent.edges():
-        if sent[h][d]["deprel"] == "mwe":
-            sent[h][d]["deprel"] = "fixed"
-            print(sent)
-    return sent
 
 def modif_free_mwe_labels(sent,most_common_label_filler):
     for h,d in sent.edges():
@@ -214,9 +203,8 @@ def main():
         sx = modif_labels(s)
         s1 = flatten_mwe_chains(sx,most_common_label_filler)
         sm = modif_fixed_mwe_labels(s1,most_common_label_filler)
-        sm2 = modif_free_mwe_labels(sm,most_common_label_filler)
         #sm3 = detect_violations(sm2)
-        modif_treebank.append(sm2)
+        modif_treebank.append(sm)
 
     print("LANGUAGE Finished here")
     cio.write_conll(modif_treebank,args.output, "conll2006",print_fused_forms=False, print_comments=False)

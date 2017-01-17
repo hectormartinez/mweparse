@@ -1,11 +1,6 @@
 fixed
-name
 ---
-aux
-auxpass
 compound
-cop
-foreign
 compound:prt
 cc:preconj
 auxpass:reflex

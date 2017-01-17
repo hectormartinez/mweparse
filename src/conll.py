@@ -271,6 +271,8 @@ class CoNLLReader(object):
                 token_dict = {key: conv_fn(val) for (key, conv_fn), val in zip(self.CONLL06_COLUMNS, parts)}
 
                 sent.add_node(token_dict['id'], token_dict)
+                if token_dict['deprel'] == "mwe":
+                    token_dict['deprel'] = "fixed"
                 sent.add_edge(token_dict['head'], token_dict['id'], deprel=token_dict['deprel'])
             elif len(parts) == 0  or (len(parts)==1 and parts[0]==""):
                 sentences.append(sent)
@@ -371,6 +373,8 @@ class CoNLLReader(object):
 
                 token_dict = {key: conv_fn(val) for (key, conv_fn), val in zip(self.CONLL_U_COLUMNS, parts)}
                 if isinstance(token_dict['id'], int):
+                    if token_dict['deprel'] == "mwe":
+                        token_dict['deprel'] = "fixed"
                     sent.add_edge(token_dict['head'], token_dict['id'], deprel=token_dict['deprel'])
                     sent.node[token_dict['id']].update({k: v for (k, v) in token_dict.items()
                                                         if k not in ('head', 'id', 'deprel', 'deps')})
@@ -378,6 +382,8 @@ class CoNLLReader(object):
                         pass
                     else:
                         for head, deprel in token_dict['deps']:
+                            if deprel == "mwe":
+                                deprel = "fixed"
                             sent.add_edge(head, token_dict['id'], deprel=deprel, secondary=True)
                 else:
                     #print(token_dict['id'])

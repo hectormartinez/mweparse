@@ -1,4 +1,4 @@
-mwe
+fixed
 name
 ---
 compound
